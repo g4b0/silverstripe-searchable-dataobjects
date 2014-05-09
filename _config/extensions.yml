@@ -1,0 +1,6 @@
+---
+Name: searchable-dataobjects-extensions
+---
+ContentController:
+  extensions:
+    - CustomSearch
