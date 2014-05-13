@@ -1,0 +1,15 @@
+{
+    "name": "zirak/searchable-dataobjects",
+    "description": "This module adds DataObjects to frontend search",
+    "type": "silverstripe-module",
+    "keywords": ["silverstripe", "dataobject", "search"],
+    "license": "GPL-2",
+    "authors": [{
+        "name": "Gabriele Brosulo - Zirak",
+        "email": "gabriele.brosulo@zirak.it"
+    }],
+    "require": {
+        "silverstripe/framework": "3.1.*",
+        "silverstripe/cms": "3.1.*"
+    }
+}

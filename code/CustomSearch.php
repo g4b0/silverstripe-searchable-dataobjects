@@ -53,31 +53,13 @@ class CustomSearch extends Extension {
 		$s = $v["start"];
 		
 		$input = DB::getConn()->addslashes($q);
-		$data = DB::query("SELECT ID, ClassName FROM SearchableDataObjects WHERE MATCH (Title, Content) AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
+		$data = DB::query("SELECT * FROM SearchableDataObjects WHERE MATCH (Title, Content) AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
 		
 		foreach ($data as $row) {
 			
 			$do = DataObject::get_by_id($row['ClassName'], $row['ID']);
-			switch ($row['ClassName']) {
-				case 'DoSoftware':
-					$do->Title = $do->descrizione;
-					$do->Content = strip_tags($do->descrizione_html);
-					break;
-				case 'DoProdotto':
-					$do->Title = $do->descrizione;
-					$do->Content = strip_tags($do->descrizione);
-					break;
-				default:
-					break;
-			}
-			
-			$pattern = '/(\[embed.*\])/si';
-			$replacement = '';
-			$do->Content = preg_replace($pattern, $replacement, $do->Content);
-
-			$pattern = '/(\[.*?\])/si';
-			$replacement = '';
-			$do->Content = preg_replace($pattern, $replacement, $do->Content);					
+			$do->Title = $row['Title'];
+			$do->Content = $row['Content'];
 						
 			$list->push($do);
 		}
