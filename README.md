@@ -163,3 +163,7 @@ Full-text searches are natural language searches if the IN NATURAL LANGUAGE MODE
 
  * Add other search method in configuration
  * Add page lenght in configuration
+
+### Suggested modules
+
+ * Linkable DataObjects: http://addons.silverstripe.org/add-ons/zirak/linkable-dataobjects
