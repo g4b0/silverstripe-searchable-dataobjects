@@ -50,7 +50,7 @@ class DoNews extends DataObject implements Searchable {
 	 * @return array
 	 */
 	public static function getSearchFilter() {
-		return null;
+		return array();
 	}
 
 	/**
