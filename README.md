@@ -17,7 +17,7 @@ they are not included in frontend search. This module let you insert DataObject 
 
 Install the module through [composer](http://getcomposer.org):
 
-	composer require zirak/searchable-dataobject
+	composer require zirak/searchable-dataobjects
   composer update
 
 Make the DataObject (or Pages) implement Searchable interface (you need to implement Link(), getSearchFilter(), getTitleFields(), 
