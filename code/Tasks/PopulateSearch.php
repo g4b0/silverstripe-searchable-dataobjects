@@ -18,7 +18,7 @@ class PopulateSearch extends BuildTask {
 													ID int(10) unsigned NOT NULL,
 													ClassName varchar(255) NOT NULL,
 													Title varchar(255) NOT NULL,
-													Content text NOT NULL,
+													Content text NOT NULL,e
 													PageID integer NOT NULL DEFAULT 0,
 													PRIMARY KEY(ID, ClassName)
 												) ENGINE=MyISAM");
@@ -38,7 +38,6 @@ class PopulateSearch extends BuildTask {
 			(!$first) ? $Title .= ' ' : $first = false;
 			$Title .= Purifier::PurifyTXT($do->$field);
 		}
-		echo "$Title\n";
 		$Title = DB::getConn()->addslashes($Title);
 
 		// Content
@@ -48,7 +47,6 @@ class PopulateSearch extends BuildTask {
 			(!$first) ? $Content .= ' ' : $first = false;
 			$Content .= ' ' . Purifier::PurifyTXT($do->$field);
 		}
-		echo "$Content\n";
 		$Content = DB::getConn()->addslashes($Content);
 
 		DB::query("INSERT INTO SearchableDataObjects(ID,  ClassName, Title, Content) VALUES ("
