@@ -65,10 +65,10 @@ class CustomSearch extends Extension {
 		}
 			
 		$ret = new PaginatedList($list);
-		$ret->pageLength = 10;
-		$ret->pageStart = $s;
-		$ret->totalItems = $list->count();
-		$ret->limitItems = 0;
+		$ret->setPageLength(10);
+		$ret->setPageStart($s);
+		$ret->setTotalItems($list->count());
+		$ret->setLimitItems(0);
 		
 		return $ret;
 	}
