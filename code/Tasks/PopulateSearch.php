@@ -18,7 +18,7 @@ class PopulateSearch extends BuildTask {
 													ID int(10) unsigned NOT NULL,
 													ClassName varchar(255) NOT NULL,
 													Title varchar(255) NOT NULL,
-													Content text NOT NULL,e
+													Content text NOT NULL,
 													PageID integer NOT NULL DEFAULT 0,
 													PRIMARY KEY(ID, ClassName)
 												) ENGINE=MyISAM");
