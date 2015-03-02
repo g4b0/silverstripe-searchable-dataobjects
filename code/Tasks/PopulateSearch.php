@@ -33,25 +33,16 @@ class PopulateSearch extends BuildTask {
 	public static function insert(DataObject $do) {
 		// Title
 		$Title = '';
-		$first = true;
 		foreach($do->getTitleFields() as $field) {
-			(!$first) ? $Title .= ' ' : $first = false;
-			$Title .= Purifier::PurifyTXT($do->$field);
+			$Title .= Purifier::PurifyTXT($do->$field). ' ';
 		}
-		$Title = DB::getConn()->addslashes($Title);
 
 		// Content
 		$Content = '';
-		$first = true;
 		foreach($do->getContentFields() as $field) {
-			(!$first) ? $Content .= ' ' : $first = false;
-			$Content .= ' ' . Purifier::PurifyTXT($do->$field);
+			$Content .= Purifier::PurifyTXT($do->$field). ' ';
 		}
-		$Content = DB::getConn()->addslashes($Content);
-
-		DB::query("INSERT INTO SearchableDataObjects(ID,  ClassName, Title, Content) VALUES ("
-						. "$do->ID, '$do->ClassName', '$Title', '$Content')"
-						. "ON DUPLICATE KEY UPDATE Title='$Title', Content='$Content'");
+		self::storeData($do->ID, $do->ClassName, trim($Title), trim($Content));
 	}
 	
 	/**
@@ -60,16 +51,44 @@ class PopulateSearch extends BuildTask {
 	 */
 	public static function insertPage(Page $p) {
 		
-		$Title = DB::getConn()->addslashes($p->Title);
 		$Content = Purifier::PurifyTXT($p->Content);
 		$Content = Purifier::RemoveEmbed($Content);
-		$Content = DB::getConn()->addslashes($Content);
-		DB::query("INSERT INTO SearchableDataObjects(ID,  ClassName, Title, Content) VALUES ("
-						. "$p->ID, '$p->ClassName', '$Title', '$Content')"
-						. "ON DUPLICATE KEY UPDATE Title='$Title', Content='$Content'");
-			
+
+		self::storeData($p->ID, $p->ClassName, $p->Title, $Content);
 	}
-	
+
+	/**
+	 * Escape the data and store to the database
+	 * @param $id
+	 * @param $class_name
+	 * @param $title
+	 * @param $content
+	 */
+
+	private static function storeData($id, $class_name, $title, $content)
+	{
+		// prepare the query ...
+		$query = sprintf(
+			'INSERT INTO `SearchableDataObjects`
+				(`ID`,  `ClassName`, `Title`, `Content`)
+			 VALUES
+			 	(%1$d, \'%2$s\', \'%3$s\', \'%4$s\')
+			 ON DUPLICATE KEY
+			 UPDATE
+			 	Title=\'%3$s\',
+			 	Content=\'%4$s\'
+			',
+			intval($id),
+			DB::getConn()->addslashes($class_name),
+			DB::getConn()->addslashes($title),
+			DB::getConn()->addslashes($content)
+		);
+
+		// run query ...
+		DB::query($query);
+	}
+
+
 	/**
 	 * Task run
 	 * @param type $request
