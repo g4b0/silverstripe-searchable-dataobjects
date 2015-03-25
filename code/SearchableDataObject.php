@@ -19,7 +19,7 @@ class SearchableDataObject extends DataExtension {
 		parent::onAfterWrite();
 		
 		if (in_array('Searchable', class_implements($this->owner->class))) {
-			$filterID = "ID={$this->owner->ID}";			
+			$filterID = "`{$this->owner->class}`.`ID`={$this->owner->ID}";			
 			$do = DataObject::get($this->owner->class, $filterID, false)->filter($this->owner->getSearchFilter())->first();
 			if ($do) {
 				PopulateSearch::insert($do);
