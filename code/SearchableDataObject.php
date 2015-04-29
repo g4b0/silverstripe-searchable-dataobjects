@@ -19,8 +19,15 @@ class SearchableDataObject extends DataExtension {
 		parent::onAfterWrite();
 		
 		if (in_array('Searchable', class_implements($this->owner->class))) {
-			$filterID = "`{$this->owner->class}`.`ID`={$this->owner->ID}";			
-			$do = DataObject::get($this->owner->class, $filterID, false)->filter($this->owner->getSearchFilter())->first();
+			if($this->owner->hasExtension('Versioned')) {
+		            $filterID = array('ID' => $this->owner->ID);
+		            $filter = $filterID + $this->owner->getSearchFilter();
+		            $do = Versioned::get_by_stage($this->owner->class, 'Live')->filter($filter)->first();
+		        } else {
+		            $filterID = "`{$this->owner->class}`.`ID`={$this->owner->ID}";
+		            $do = DataObject::get($this->owner->class, $filterID, false)->filter($this->owner->getSearchFilter())->first();
+		        }
+		        
 			if ($do) {
 				PopulateSearch::insert($do);
 			} else {
