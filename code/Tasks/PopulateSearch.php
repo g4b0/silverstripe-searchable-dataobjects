@@ -110,10 +110,14 @@ class PopulateSearch extends BuildTask {
 		$searchables = ClassInfo::implementorsOf('Searchable');
 		foreach ($searchables as $class) {
 			// Filter
-			
 			$dos = $class::get()->filter($class::getSearchFilter());
-			
-			$dos = $class::get()->filter(array());
+
+		        $versionedCheck = $dos->first();
+		
+		        if($versionedCheck->hasExtension('Versioned')) {
+		            $dos = Versioned::get_by_stage($class, 'Live')->filter($class::getSearchFilter());
+		        }
+
 			foreach ($dos as $do) {
 				self::insert($do);
 			}
