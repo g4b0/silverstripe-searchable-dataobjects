@@ -112,14 +112,17 @@ class PopulateSearch extends BuildTask {
 			// Filter
 			$dos = $class::get()->filter($class::getSearchFilter());
 
-		        $versionedCheck = $dos->first();
-		
-		        if($versionedCheck->hasExtension('Versioned')) {
-		            $dos = Versioned::get_by_stage($class, 'Live')->filter($class::getSearchFilter());
-		        }
 
-			foreach ($dos as $do) {
-				self::insert($do);
+			if($dos->exists()) {
+			        $versionedCheck = $dos->first();
+			
+			        if($versionedCheck->hasExtension('Versioned')) {
+			            $dos = Versioned::get_by_stage($class, 'Live')->filter($class::getSearchFilter());
+			        }
+	
+				foreach ($dos as $do) {
+					self::insert($do);
+				}
 			}
 		}
 		
