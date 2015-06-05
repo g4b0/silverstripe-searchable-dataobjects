@@ -42,7 +42,7 @@ class SearchableDataObject extends DataExtension {
 	 * Remove the entry from the search table before deleting it
 	 */
 	public function onBeforeDelete() {
-		parent::onAfterDelete();
+		parent::onBeforeDelete();
 		
 		$this->deleteDo($this->owner);
 	}
