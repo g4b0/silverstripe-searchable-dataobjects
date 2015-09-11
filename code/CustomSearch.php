@@ -51,11 +51,7 @@ class CustomSearch extends Extension {
 		$list = new ArrayList();
 
 		$v = $request->getVars();
-		if (!isset($v["start"]))
-			$v["start"] = 0;
-
 		$q = $v["Search"];
-		$s = max(intval($v["start"]), 0);
 
 		$input = DB::getConn()->addslashes($q);
 		$data = DB::query("SELECT * FROM SearchableDataObjects WHERE MATCH (Title, Content) AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
@@ -70,11 +66,8 @@ class CustomSearch extends Extension {
 		}
 
 		$pageLength = Config::inst()->get('CustomSearch', 'items_per_page');
-		$ret = new PaginatedList($list);
+		$ret = new PaginatedList($list, $request);
 		$ret->setPageLength($pageLength);
-		$ret->setPageStart($s);
-		$ret->setTotalItems($list->count());
-		$ret->setLimitItems($pageLength);
 
 		return $ret;
 	}
