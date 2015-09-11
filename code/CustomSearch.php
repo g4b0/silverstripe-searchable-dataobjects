@@ -55,7 +55,7 @@ class CustomSearch extends Extension {
 			$v["start"] = 0;
 
 		$q = $v["Search"];
-		$s = $v["start"];
+		$s = max(intval($v["start"]), 0);
 
 		$input = DB::getConn()->addslashes($q);
 		$data = DB::query("SELECT * FROM SearchableDataObjects WHERE MATCH (Title, Content) AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
