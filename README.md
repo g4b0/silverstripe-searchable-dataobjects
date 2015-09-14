@@ -8,9 +8,11 @@ Pages are not always the better way to implement things. For example site news c
 would be a big and difficult to manage SiteTree. DataObjects help maintaining things clean and straight, but unfortunately 
 they are not included in frontend search. This module let you insert DataObject in search.
 
+Warning: from version 2.0 SearchableDataObject require SS v. 3.1.13 or greater
+
 ## Requirements
 
- * SilverStripe 3.1
+ * SilverStripe 3.1.13 or greater 
  * zirak/htmlpurifier
 
 ### Installation
