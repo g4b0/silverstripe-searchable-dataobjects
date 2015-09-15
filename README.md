@@ -54,6 +54,26 @@ class DoNews extends DataObject implements Searchable {
 	public static function getSearchFilter() {
 		return array();
 	}
+	
+	/**
+	 * FilterAny array (optional)
+	 * eg. array('Disabled' => 0, 'Override' => 1);
+	 * @return array
+	 */
+	public static function getSearchFilterAny() {
+		return array();
+	}
+    	
+	/**
+	 * FilterByCallback function (optional)
+	 * eg. function($object){
+	 *	return ($object->StartDate > date('Y-m-d') || $object->isStillRecurring());
+	 * };
+	 * @return array
+	 */
+	public static function getSearchFilterByCallback() {
+		return function($object){};
+	}
 
 	/**
 	 * Fields that compose the Title
