@@ -4,7 +4,3 @@ Name: searchable-dataobjects-extensions
 ContentController:
   extensions:
     - CustomSearch
-DevelopmentAdmin:
-  registered_controllers:
-      build:
-        controller: 'SearchableDevBuild'
