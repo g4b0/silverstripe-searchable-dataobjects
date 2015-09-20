@@ -170,6 +170,24 @@ Run a `dev/build` and then populate the search table running PopulateSearch task
 
 Enjoy the news into the search results :)
 
+### Modifying
+
+#### Set the number of search results per page
+
+Setting the `CustomSearch.items_per_page` config setting you can define, how many search results per page are shown. Default is 10
+
+By default the search result is shown at the same page, so if you're searching e.g. on the */about-us/*, the results are 
+shown on */about-us/SearchForm/?s=foo*. If you don't like that, you can define any Page or Controller class in the 
+`CustomSearch.search_controller` setting. If you set this setting to `this`, the current page will be used. Defaults to `SearchPage` 
+and falls back to the current page if no SearchPage is found. 
+
+```YAML
+
+CustomSearch:
+  items_per_page: 15
+  search_controller: SearchPage #page type to show the search
+```
+
 ### Note
 
 Searchable DataObjects module use Mysql NATURAL LANGUAGE MODE search method, so during your tests be sure not to have all DataObjetcs
@@ -184,7 +202,6 @@ Full-text searches are natural language searches if the IN NATURAL LANGUAGE MODE
 ### TODO
 
  * Add other search method in configuration
- * Add page length in configuration
 
 ### Suggested modules
 
