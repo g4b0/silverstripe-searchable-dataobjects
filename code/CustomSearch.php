@@ -28,7 +28,7 @@ class CustomSearch extends Extension {
 	 * Site search form
 	 */
 	public function SearchForm() {
-		$form = new SearchForm($this->owner, 'SearchForm', $this->getSearchFields(), $this->getSearchActions());
+		$form = new SearchForm($this->getControllerForSearchForm(), 'SearchForm', $this->getSearchFields(), $this->getSearchActions());
 		return $form;
 	}
 
@@ -66,6 +66,34 @@ class CustomSearch extends Extension {
 		$this->owner->extend('updateSearchActions', $actions);
 
 		return $actions;
+	}
+
+	/**
+	 *
+	 * @return ContentController
+	 */
+	public function getControllerForSearchForm() {
+		$controllerName = Config::inst()->get('CustomSearch', 'search_controller');
+
+		if ($controllerName == 'this') {
+			return $this->owner;
+		}
+
+		if (class_exists($controllerName)) {
+			$obj = Object::create($controllerName);
+
+			if ($obj instanceof SiteTree && $page = $controllerName::get()->first()) {
+				return ModelAsController::controller_for($page);
+			}
+
+			if ($obj instanceof Controller) {
+				return $obj;
+			}
+		}
+
+		//fallback:
+		//@todo: throw notice
+		return $this->owner;
 	}
 
 	/**
