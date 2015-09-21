@@ -13,7 +13,13 @@ class CustomSearch extends Extension {
 	 */
 	private static $items_per_page = 10;
 
-	static $allowed_actions = array(
+	/**
+	 * either 'this' for the current page (owner) or a page / controller, e.g. 'SearchPage'
+	 * @var string
+	 */
+	private static $search_controller = 'SearchPage';
+
+	private static $allowed_actions = array(
 			'SearchForm',
 			'results',
 	);
@@ -22,7 +28,16 @@ class CustomSearch extends Extension {
 	 * Site search form
 	 */
 	public function SearchForm() {
+		$form = new SearchForm($this->getControllerForSearchForm(), 'SearchForm', $this->getSearchFields(), $this->getSearchActions());
+		return $form;
+	}
 
+	/**
+	 * generates the fields for the SearchForm
+	 * @uses updateSearchFields
+	 * @return FieldList
+	 */
+	public function getSearchFields() {
 		$searchText = _t('SearchForm.SEARCH', 'Search');
 
 		if ($this->owner->request && $this->owner->request->getVar('Search')) {
@@ -30,13 +45,55 @@ class CustomSearch extends Extension {
 		}
 
 		$fields = new FieldList(
-						new TextField('Search', false, $searchText)
+			new TextField('Search', false, $searchText)
 		);
+
+		$this->owner->extend('updateSearchFields', $fields);
+
+		return $fields;
+	}
+
+	/**
+	 * generates the actions of the SearchForm
+	 * @uses updateSearchActions
+	 * @return FieldList
+	 */
+	public function getSearchActions() {
 		$actions = new FieldList(
-						new FormAction('results', _t('SearchForm.GO', 'Go'))
+			new FormAction('results', _t('SearchForm.GO', 'Go'))
 		);
-		$form = new SearchForm($this->owner, 'SearchForm', $fields, $actions);
-		return $form;
+
+		$this->owner->extend('updateSearchActions', $actions);
+
+		return $actions;
+	}
+
+	/**
+	 *
+	 * @return ContentController
+	 */
+	public function getControllerForSearchForm() {
+		$controllerName = Config::inst()->get('CustomSearch', 'search_controller');
+
+		if ($controllerName == 'this') {
+			return $this->owner;
+		}
+
+		if (class_exists($controllerName)) {
+			$obj = Object::create($controllerName);
+
+			if ($obj instanceof SiteTree && $page = $controllerName::get()->first()) {
+				return ModelAsController::controller_for($page);
+			}
+
+			if ($obj instanceof Controller) {
+				return $obj;
+			}
+		}
+
+		//fallback:
+		//@todo: throw notice
+		return $this->owner;
 	}
 
 	/**
