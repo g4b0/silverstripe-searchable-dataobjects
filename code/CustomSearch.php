@@ -134,7 +134,7 @@ class CustomSearch extends Extension {
 		$data = array(
 				'Results' => $this->getSearchResults($request),
 				'Query' => $form->getSearchQuery(),
-				'Title' => _t('Search_results', 'Risultati della ricerca')
+                'Title' => _t('CustomSearch.SEARCHRESULTS', 'Risultati della ricerca')
 		);
 		return $this->owner->customise($data)->renderWith(array('Page_results', 'Page'));
 	}
