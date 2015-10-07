@@ -116,6 +116,20 @@ class CustomSearch extends Extension {
 		foreach ($data as $row) {
 
 			$do = DataObject::get_by_id($row['ClassName'], $row['ID']);
+
+            /*
+             * Skip rows from SearchableDataObjects where the row data fails to
+             * look up a valid DataObject using the claimed ClassName and ID to
+             * prevent PHP notice:
+             *
+             *      [Strict Notice] Creating default object from empty value
+             *
+             * caused when DataObject::get_by_id() returns false
+             */
+            if(!is_object($do) || !$do->exists()) {
+                continue;
+            }
+
 			$do->Title = $row['Title'];
 			$do->Content = $row['Content'];
 
