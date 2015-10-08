@@ -23,6 +23,8 @@ Install the module through [composer](http://getcomposer.org):
 Make the DataObject (or Pages) implement Searchable interface (you need to implement Link(), getSearchFilter(), getTitleFields(), 
 getContentFields()):
 
+*Note: `getSearchFilterByCallback()` is an optional filter. If you don't plan on calculating any value to determine a returned `true` or `false` value it is suggested you don't add this function to your `DataObject` or `Page` type.*
+
 ```php
 class DoNews extends DataObject implements Searchable {
 
@@ -70,7 +72,7 @@ class DoNews extends DataObject implements Searchable {
 	 * @return array
 	 */
 	public static function getSearchFilterByCallback() {
-		return function($object){};
+		return function($object){ return true; };
 	}
 
 	/**
