@@ -118,22 +118,23 @@ class CustomSearch extends Extension {
 			$do = DataObject::get_by_id($row['ClassName'], $row['ID']);
 
             /*
-             * Skip rows from SearchableDataObjects where the row data fails to
-             * look up a valid DataObject using the claimed ClassName and ID to
+             * Check that we have been returned a valid DataObject, using the
+             * ClassName and ID stored in the SortableDataObject DB table, to
              * prevent PHP notice:
              *
              *      [Strict Notice] Creating default object from empty value
              *
              * caused when DataObject::get_by_id() returns false
              */
-            if(!is_object($do) || !$do->exists()) {
-                continue;
+            if(is_object($do) && $do->exists()) {
+            
+                $do->Title = $row['Title'];
+                $do->Content = $row['Content'];
+
+                $list->push($do);
+
             }
 
-			$do->Title = $row['Title'];
-			$do->Content = $row['Content'];
-
-			$list->push($do);
 		}
 
 		$pageLength = Config::inst()->get('CustomSearch', 'items_per_page');
