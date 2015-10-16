@@ -6,116 +6,120 @@
  * @package cms
  * @subpackage search
  */
-class CustomSearch extends Extension {
+class CustomSearch extends Extension
+{
+    /**
+     * @var int the number of items for each page, used for pagination
+     */
+    private static $items_per_page = 10;
 
-	/**
-	 * @var int the number of items for each page, used for pagination
-	 */
-	private static $items_per_page = 10;
+    /**
+     * either 'this' for the current page (owner) or a page / controller, e.g. 'SearchPage'
+     * @var string
+     */
+    private static $search_controller = 'SearchPage';
+    private static $allowed_actions   = array(
+        'SearchForm',
+        'results',
+    );
 
-	/**
-	 * either 'this' for the current page (owner) or a page / controller, e.g. 'SearchPage'
-	 * @var string
-	 */
-	private static $search_controller = 'SearchPage';
+    /**
+     * Site search form
+     */
+    public function SearchForm()
+    {
+        $form = new SearchForm($this->getControllerForSearchForm(), 'SearchForm', $this->getSearchFields(), $this->getSearchActions());
+        return $form;
+    }
 
-	private static $allowed_actions = array(
-			'SearchForm',
-			'results',
-	);
+    /**
+     * generates the fields for the SearchForm
+     * @uses updateSearchFields
+     * @return FieldList
+     */
+    public function getSearchFields()
+    {
+        $searchText = _t('SearchForm.SEARCH', 'Search');
 
-	/**
-	 * Site search form
-	 */
-	public function SearchForm() {
-		$form = new SearchForm($this->getControllerForSearchForm(), 'SearchForm', $this->getSearchFields(), $this->getSearchActions());
-		return $form;
-	}
+        if ($this->owner->request && $this->owner->request->getVar('Search')) {
+            $searchText = $this->owner->request->getVar('Search');
+        }
 
-	/**
-	 * generates the fields for the SearchForm
-	 * @uses updateSearchFields
-	 * @return FieldList
-	 */
-	public function getSearchFields() {
-		$searchText = _t('SearchForm.SEARCH', 'Search');
+        $fields = new FieldList(
+            new TextField('Search', false, $searchText)
+        );
 
-		if ($this->owner->request && $this->owner->request->getVar('Search')) {
-			$searchText = $this->owner->request->getVar('Search');
-		}
+        $this->owner->extend('updateSearchFields', $fields);
 
-		$fields = new FieldList(
-			new TextField('Search', false, $searchText)
-		);
+        return $fields;
+    }
 
-		$this->owner->extend('updateSearchFields', $fields);
+    /**
+     * generates the actions of the SearchForm
+     * @uses updateSearchActions
+     * @return FieldList
+     */
+    public function getSearchActions()
+    {
+        $actions = new FieldList(
+            new FormAction('results', _t('SearchForm.GO', 'Go'))
+        );
 
-		return $fields;
-	}
+        $this->owner->extend('updateSearchActions', $actions);
 
-	/**
-	 * generates the actions of the SearchForm
-	 * @uses updateSearchActions
-	 * @return FieldList
-	 */
-	public function getSearchActions() {
-		$actions = new FieldList(
-			new FormAction('results', _t('SearchForm.GO', 'Go'))
-		);
+        return $actions;
+    }
 
-		$this->owner->extend('updateSearchActions', $actions);
+    /**
+     *
+     * @return ContentController
+     */
+    public function getControllerForSearchForm()
+    {
+        $controllerName = Config::inst()->get('CustomSearch', 'search_controller');
 
-		return $actions;
-	}
+        if ($controllerName == 'this') {
+            return $this->owner;
+        }
 
-	/**
-	 *
-	 * @return ContentController
-	 */
-	public function getControllerForSearchForm() {
-		$controllerName = Config::inst()->get('CustomSearch', 'search_controller');
+        if (class_exists($controllerName)) {
+            $obj = Object::create($controllerName);
 
-		if ($controllerName == 'this') {
-			return $this->owner;
-		}
+            if ($obj instanceof SiteTree && $page = $controllerName::get()->first()) {
+                return ModelAsController::controller_for($page);
+            }
 
-		if (class_exists($controllerName)) {
-			$obj = Object::create($controllerName);
+            if ($obj instanceof Controller) {
+                return $obj;
+            }
+        }
 
-			if ($obj instanceof SiteTree && $page = $controllerName::get()->first()) {
-				return ModelAsController::controller_for($page);
-			}
+        //fallback:
+        //@todo: throw notice
+        return $this->owner;
+    }
 
-			if ($obj instanceof Controller) {
-				return $obj;
-			}
-		}
+    /**
+     * Process and render search results.
+     *
+     * @param array $data The raw request data submitted by user
+     * @param SearchForm $form The form instance that was submitted
+     * @param SS_HTTPRequest $request Request generated for this action
+     */
+    public function getSearchResults($request)
+    {
 
-		//fallback:
-		//@todo: throw notice
-		return $this->owner;
-	}
+        $list = new ArrayList();
 
-	/**
-	 * Process and render search results.
-	 *
-	 * @param array $data The raw request data submitted by user
-	 * @param SearchForm $form The form instance that was submitted
-	 * @param SS_HTTPRequest $request Request generated for this action
-	 */
-	public function getSearchResults($request) {
+        $v = $request->getVars();
+        $q = $v["Search"];
 
-		$list = new ArrayList();
+        $input = DB::getConn()->addslashes($q);
+        $data  = DB::query("SELECT * FROM SearchableDataObjects WHERE MATCH (Title, Content) AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
 
-		$v = $request->getVars();
-		$q = $v["Search"];
+        foreach ($data as $row) {
 
-		$input = DB::getConn()->addslashes($q);
-		$data = DB::query("SELECT * FROM SearchableDataObjects WHERE MATCH (Title, Content) AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
-
-		foreach ($data as $row) {
-
-			$do = DataObject::get_by_id($row['ClassName'], $row['ID']);
+            $do = DataObject::get_by_id($row['ClassName'], $row['ID']);
 
             /*
              * Check that we have been returned a valid DataObject, using the
@@ -126,32 +130,30 @@ class CustomSearch extends Extension {
              *
              * caused when DataObject::get_by_id() returns false
              */
-            if(is_object($do) && $do->exists()) {
-            
-                $do->Title = $row['Title'];
+            if (is_object($do) && $do->exists()) {
+
+                $do->Title   = $row['Title'];
                 $do->Content = $row['Content'];
 
                 $list->push($do);
-
             }
+        }
 
-		}
+        $pageLength = Config::inst()->get('CustomSearch', 'items_per_page');
+        $ret        = new PaginatedList($list, $request);
+        $ret->setPageLength($pageLength);
 
-		$pageLength = Config::inst()->get('CustomSearch', 'items_per_page');
-		$ret = new PaginatedList($list, $request);
-		$ret->setPageLength($pageLength);
+        return $ret;
+    }
 
-		return $ret;
-	}
+    public function results($data, $form, $request)
+    {
 
-	public function results($data, $form, $request) {
-
-		$data = array(
-				'Results' => $this->getSearchResults($request),
-				'Query' => $form->getSearchQuery(),
-                'Title' => _t('CustomSearch.SEARCHRESULTS', 'Risultati della ricerca')
-		);
-		return $this->owner->customise($data)->renderWith(array('Page_results', 'Page'));
-	}
-
+        $data = array(
+            'Results' => $this->getSearchResults($request),
+            'Query' => $form->getSearchQuery(),
+            'Title' => _t('CustomSearch.SEARCHRESULTS', 'Risultati della ricerca')
+        );
+        return $this->owner->customise($data)->renderWith(array('Page_results', 'Page'));
+    }
 }

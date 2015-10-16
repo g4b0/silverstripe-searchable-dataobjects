@@ -1,24 +1,24 @@
 <?php
 
-class SearchPage extends Page {
-
-    private static $db = array(
+class SearchPage extends Page
+{
+    private static $db       = array(
     );
-
-    private static $has_one = array(
+    private static $has_one  = array(
     );
-
-	private static $defaults = array(
+    private static $defaults = array(
         'ShowInMenu' => false
     );
 
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         $fields = parent::getCMSFields();
 
         return $fields;
     }
 }
 
-class SearchPage_Controller extends Page_Controller {
+class SearchPage_Controller extends Page_Controller
+{
 
 }
