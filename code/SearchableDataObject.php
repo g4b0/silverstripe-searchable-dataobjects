@@ -24,7 +24,7 @@ class SearchableDataObject extends DataExtension {
 		            $filter = $filterID + $this->owner->getSearchFilter();
 		            $do = Versioned::get_by_stage($this->owner->class, 'Live')->filter($filter)->first();
 		        } else {
-		            $filterID = "`{$this->owner->class}`.`ID`={$this->owner->ID}";
+		            $filterID = "`{$this->findParentClass()}`.`ID`={$this->owner->ID}";
 		            $do = DataObject::get($this->owner->class, $filterID, false)->filter($this->owner->getSearchFilter())->first();
 		        }
 		        
@@ -61,5 +61,18 @@ class SearchableDataObject extends DataExtension {
 												) ENGINE=MyISAM");
     DB::query("ALTER TABLE SearchableDataObjects ADD FULLTEXT (`Title` ,`Content`)");
   }
+  
+	/**
+	 * Recursive function to find the parent class of the current data object
+	 */
+	private function findParentClass($class = null) {
+		if(is_null($class)) {
+			$class = $this->owner->class;
+		}
+
+		$parent = singleton($class)->parentClass();
+
+		return $parent === 'DataObject' ? $class : $this->findParentClass($parent);
+	}
 	
 }
