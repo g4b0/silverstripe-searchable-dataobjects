@@ -21,7 +21,7 @@ class PopulateSearch extends BuildTask {
 													Content text NOT NULL,
 													PageID integer NOT NULL DEFAULT 0,
 													PRIMARY KEY(ID, ClassName)
-												) ENGINE=MyISAM");
+												) ENGINE=MyISAM CHARACTER SET=utf8 COLLATE utf8_unicode_ci");
 		DB::query("ALTER TABLE SearchableDataObjects ADD FULLTEXT (`Title` ,`Content`)");
 	}
 	
