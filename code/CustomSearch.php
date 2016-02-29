@@ -127,7 +127,7 @@ class CustomSearch extends Extension {
              * caused when DataObject::get_by_id() returns false
              */
             if(is_object($do) && $do->exists()) {
-            
+
                 $do->Title = $row['Title'];
                 $do->Content = $row['Content'];
 
