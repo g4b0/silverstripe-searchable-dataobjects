@@ -8,7 +8,7 @@
  * @creation-date 23-Apr-2014
  */
 class PopulateSearch extends BuildTask {
-	
+
 	/**
 	 * DB initalization
 	 */
@@ -24,7 +24,7 @@ class PopulateSearch extends BuildTask {
 												) ENGINE=MyISAM");
 		DB::query("ALTER TABLE SearchableDataObjects ADD FULLTEXT (`Title` ,`Content`)");
 	}
-	
+
 	/**
 	 * Refactor the DataObject in order to match with SearchableDataObjects table
 	 * and insert it into the database
@@ -44,13 +44,13 @@ class PopulateSearch extends BuildTask {
 		}
 		self::storeData($do->ID, $do->ClassName, trim($Title), trim($Content));
 	}
-	
+
 	/**
 	 * Clean page's title and content and insert it into SearchableDataObjects
 	 * @param Page $p
 	 */
 	public static function insertPage(Page $p) {
-		
+
 		$Content = Purifier::PurifyTXT($p->Content);
 		$Content = Purifier::RemoveEmbed($Content);
 
@@ -95,7 +95,7 @@ class PopulateSearch extends BuildTask {
 	 */
 	public function run($request) {
 		$this->clearTable();
-				
+
 		/*
 		 * Page
 		 */
@@ -103,10 +103,10 @@ class PopulateSearch extends BuildTask {
 		foreach ($pages as $p) {
 			self::insertPage($p);
 		}
-		
+
 		/*
 		 * DataObjects
-		 */		
+		 */
 		$searchables = ClassInfo::implementorsOf('Searchable');
 		foreach ($searchables as $class) {
 			// Filter
@@ -121,17 +121,17 @@ class PopulateSearch extends BuildTask {
 
 			if($dos->exists()) {
 			        $versionedCheck = $dos->first();
-			
+
 			        if($versionedCheck->hasExtension('Versioned')) {
 			            $dos = Versioned::get_by_stage($class, 'Live')->filter($class::getSearchFilter());
 			        }
-	
+
 				foreach ($dos as $do) {
 					self::insert($do);
 				}
 			}
 		}
-		
+
 	}
-	
+
 }

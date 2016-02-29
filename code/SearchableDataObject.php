@@ -1,23 +1,23 @@
 <?php
 
 /**
- * SearchableDataObject - extension that let the DO to auto update the search table 
+ * SearchableDataObject - extension that let the DO to auto update the search table
  * after a write
  *
  * @author Gabriele Brosulo <gabriele.brosulo@zirak.it>
  * @creation-date 12-May-2014
  */
 class SearchableDataObject extends DataExtension {
-	
+
 	private function deleteDo(DataObject $do) {
 		$id = $do->ID;
 		$class = $do->class;
 		DB::query("DELETE FROM SearchableDataObjects WHERE ID=$id AND ClassName='$class'");
 	}
-	
+
 	public function onAfterWrite() {
 		parent::onAfterWrite();
-		
+
 		if (in_array('Searchable', class_implements($this->owner->class))) {
 			if($this->owner->hasExtension('Versioned')) {
 		            $filterID = array('ID' => $this->owner->ID);
@@ -27,7 +27,7 @@ class SearchableDataObject extends DataExtension {
 		            $filterID = "`{$this->findParentClass()}`.`ID`={$this->owner->ID}";
 		            $do = DataObject::get($this->owner->class, $filterID, false)->filter($this->owner->getSearchFilter())->first();
 		        }
-		        
+
 			if ($do) {
 				PopulateSearch::insert($do);
 			} else {
@@ -37,13 +37,13 @@ class SearchableDataObject extends DataExtension {
 			PopulateSearch::insertPage($this->owner);
 		}
 	}
-	
+
 	/**
 	 * Remove the entry from the search table before deleting it
 	 */
 	public function onBeforeDelete() {
 		parent::onBeforeDelete();
-		
+
 		$this->deleteDo($this->owner);
 	}
 
@@ -61,7 +61,7 @@ class SearchableDataObject extends DataExtension {
 												) ENGINE=MyISAM");
     DB::query("ALTER TABLE SearchableDataObjects ADD FULLTEXT (`Title` ,`Content`)");
   }
-  
+
 	/**
 	 * Recursive function to find the parent class of the current data object
 	 */
@@ -74,5 +74,5 @@ class SearchableDataObject extends DataExtension {
 
 		return $parent === 'DataObject' ? $class : $this->findParentClass($parent);
 	}
-	
+
 }
