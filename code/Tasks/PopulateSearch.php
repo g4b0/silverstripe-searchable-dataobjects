@@ -9,12 +9,17 @@
  */
 class PopulateSearch extends BuildTask
 {
+    /** @var string Task title */
+    protected $title = 'Populate Search';
+    /** @var string Task description */
+    protected $description = 'Re-create the search table at each run, and populate it with the data from the DataObject.';
 
     /**
      * DB initalization
      */
     private function clearTable()
     {
+        // remove existing table and recreate
         DB::query("DROP TABLE IF EXISTS SearchableDataObjects");
 
         // create searchable table and index
