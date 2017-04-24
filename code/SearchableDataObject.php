@@ -56,14 +56,26 @@ class SearchableDataObject extends DataExtension
    */
     public function augmentDatabase()
     {
-        DB::query("CREATE TABLE IF NOT EXISTS SearchableDataObjects (
-                          ID int(10) unsigned NOT NULL,
-                          ClassName varchar(255) NOT NULL,
-                          Title varchar(255) NOT NULL,
-                          Content text NOT NULL,
-                          PageID integer NOT NULL DEFAULT 0,
-                          PRIMARY KEY(ID, ClassName)
-                        ) ENGINE=MyISAM");
+        $connection = DB::getConn();
+        $isMySQL = ($connection->getDatabaseServer() === 'mysql');
+        $unsigned = ($isMySQL) ? 'unsigned' : '';
+        $extraOptions = ($isMySQL) ? ' ENGINE=MyISAM' : '';
+
+        // construct query
+        $sql = join('', [
+            "CREATE TABLE IF NOT EXISTS SearchableDataObjects (",
+                "ID int(10) {$unsigned} NOT NULL,",
+                "ClassName varchar(255) NOT NULL,",
+                "Title varchar(255) NOT NULL,",
+                "Content text NOT NULL,",
+                "PageID integer NOT NULL DEFAULT 0,",
+                "PRIMARY KEY(ID, ClassName)",
+            ")",
+            $extraOptions,
+        ]);
+
+        // add table
+        DB::query($sql);
 
         // add search index requirement
         DB::require_index(
