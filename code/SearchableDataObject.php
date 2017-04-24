@@ -77,12 +77,21 @@ class SearchableDataObject extends DataExtension
         // add table
         DB::query($sql);
 
+        // use current index requirement function
+        if (method_exists($connection, 'require_index')) {
+            $require_index = 'require_index';
+        } elseif (method_exists($connection, 'requireIndex')) {
+            $require_index = 'requireIndex';
+        }
+
         // add search index requirement
-        DB::require_index(
-            'SearchableDataObjects',
-            'Title',
-            array('value' => 'Title, Content', 'type' => 'fulltext')
-        );
+        if (isset($require_index)) {
+            DB::$require_index(
+                'SearchableDataObjects',
+                'Title',
+                array('value' => '"Title", "Content"', 'type' => 'fulltext')
+            );
+        }
     }
 
     /**
