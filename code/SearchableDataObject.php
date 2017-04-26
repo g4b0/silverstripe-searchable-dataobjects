@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SearchableDataObject - extension that let the DO to auto update the search table 
+ * SearchableDataObject - extension that let the DO to auto update the search table
  * after a write
  *
  * @author Gabriele Brosulo <gabriele.brosulo@zirak.it>
@@ -9,18 +9,18 @@
  */
 class SearchableDataObject extends DataExtension
 {
-    
+
     private function deleteDo(DataObject $do)
     {
         $id = $do->ID;
         $class = $do->class;
         DB::query("DELETE FROM SearchableDataObjects WHERE ID=$id AND ClassName='$class'");
     }
-    
+
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-        
+
         if (in_array('Searchable', class_implements($this->owner->class))) {
             if ($this->owner->hasExtension('Versioned')) {
                 $filterID = array('ID' => $this->owner->ID);
@@ -30,7 +30,7 @@ class SearchableDataObject extends DataExtension
                 $filterID = "`{$this->findParentClass()}`.`ID`={$this->owner->ID}";
                 $do = DataObject::get($this->owner->class, $filterID, false)->filter($this->owner->getSearchFilter())->first();
             }
-                
+
             if ($do) {
                 PopulateSearch::insert($do);
             } else {
@@ -40,33 +40,60 @@ class SearchableDataObject extends DataExtension
             PopulateSearch::insertPage($this->owner);
         }
     }
-    
+
     /**
      * Remove the entry from the search table before deleting it
      */
     public function onBeforeDelete()
     {
         parent::onBeforeDelete();
-        
+
         $this->deleteDo($this->owner);
     }
 
   /**
    * Check and create the required table during dev/build
    */
-  public function augmentDatabase()
-  {
-      DB::query("CREATE TABLE IF NOT EXISTS SearchableDataObjects (
-													ID int(10) unsigned NOT NULL,
-													ClassName varchar(255) NOT NULL,
-													Title varchar(255) NOT NULL,
-													Content text NOT NULL,
-													PageID integer NOT NULL DEFAULT 0,
-													PRIMARY KEY(ID, ClassName)
-												) ENGINE=MyISAM");
-      DB::query("ALTER TABLE SearchableDataObjects ADD FULLTEXT (`Title` ,`Content`)");
-  }
-  
+    public function augmentDatabase()
+    {
+        $connection = DB::getConn();
+        $isMySQL = ($connection->getDatabaseServer() === 'mysql');
+        $unsigned = ($isMySQL) ? 'unsigned' : '';
+        $extraOptions = ($isMySQL) ? ' ENGINE=MyISAM' : '';
+
+        // construct query
+        $sql = join('', [
+            "CREATE TABLE IF NOT EXISTS SearchableDataObjects (",
+                "ID int(10) {$unsigned} NOT NULL,",
+                "ClassName varchar(255) NOT NULL,",
+                "Title varchar(255) NOT NULL,",
+                "Content text NOT NULL,",
+                "PageID integer NOT NULL DEFAULT 0,",
+                "PRIMARY KEY(ID, ClassName)",
+            ")",
+            $extraOptions,
+        ]);
+
+        // add table
+        DB::query($sql);
+
+        // use current index requirement function
+        if (method_exists($connection, 'require_index')) {
+            $require_index = 'require_index';
+        } elseif (method_exists($connection, 'requireIndex')) {
+            $require_index = 'requireIndex';
+        }
+
+        // add search index requirement
+        if (isset($require_index)) {
+            DB::$require_index(
+                'SearchableDataObjects',
+                'Title',
+                array('value' => '"Title", "Content"', 'type' => 'fulltext')
+            );
+        }
+    }
+
     /**
      * Recursive function to find the parent class of the current data object
      */
