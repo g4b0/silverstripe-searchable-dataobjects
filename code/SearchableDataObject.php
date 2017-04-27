@@ -61,14 +61,14 @@ class SearchableDataObject extends DataExtension
         $unsigned = ($isMySQL) ? 'unsigned' : '';
         $extraOptions = ($isMySQL) ? ' ENGINE=MyISAM' : '';
 
-        // construct query
-        $sql = join('', [
+        // construct query to create table with custom primary key
+        $sql = join(' ', [
             "CREATE TABLE IF NOT EXISTS SearchableDataObjects (",
                 "ID int(10) {$unsigned} NOT NULL,",
-                "ClassName varchar(255) NOT NULL,",
-                "Title varchar(255) NOT NULL,",
-                "Content text NOT NULL,",
-                "PageID integer NOT NULL DEFAULT 0,",
+                "ClassName " . $connection->varchar(['precision' => 255]) . ",",
+                "Title " . $connection->varchar(['precision' => 255]) . " NOT NULL,",
+                "Content " . $connection->text([]) . " NOT NULL,",
+                "PageID " . $connection->int(['precision' => 11, 'null' => 'NOT NULL', 'default' => 0]) . ",",
                 "PRIMARY KEY(ID, ClassName)",
             ")",
             $extraOptions,
