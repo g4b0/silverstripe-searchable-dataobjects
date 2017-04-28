@@ -116,7 +116,7 @@ class CustomSearch extends Extension
         $q = $v["Search"];
 
         $input = DB::getConn()->addslashes($q);
-        $data = DB::query("SELECT * FROM SearchableDataObjects WHERE MATCH (Title, Content) AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
+        $data = DB::query("SELECT * FROM \"SearchableDataObjects\" WHERE MATCH (\"Title\", \"Content\") AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
 
         foreach ($data as $row) {
             $do = DataObject::get_by_id($row['ClassName'], $row['ID']);
