@@ -14,7 +14,7 @@ class SearchableDataObject extends DataExtension
     {
         $id = $do->ID;
         $class = $do->class;
-        DB::query("DELETE FROM SearchableDataObjects WHERE ID=$id AND ClassName='$class'");
+        DB::query("DELETE FROM \"SearchableDataObjects\" WHERE ID=$id AND ClassName='$class'");
     }
 
     public function onAfterWrite()
@@ -73,7 +73,7 @@ class SearchableDataObject extends DataExtension
 
         // construct query to create table with custom primary key
         $sql = join(' ', [
-            "CREATE TABLE IF NOT EXISTS SearchableDataObjects (",
+            'CREATE TABLE IF NOT EXISTS "SearchableDataObjects" (',
                 '"ID" int(10) ' . $unsigned . ' NOT NULL,',
                 '"ClassName" ' . $schema->varchar(['precision' => 255]) . ',',
                 '"Title" ' . $schema->varchar(['precision' => 255]) . ' NOT NULL,',
