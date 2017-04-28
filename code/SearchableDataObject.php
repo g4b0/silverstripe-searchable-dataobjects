@@ -61,37 +61,38 @@ class SearchableDataObject extends DataExtension
         $unsigned = ($isMySQL) ? 'unsigned' : '';
         $extraOptions = ($isMySQL) ? ' ENGINE=MyISAM' : '';
 
+        // get appropriate methods for SilverStripe version
+        $db = singleton('DB');
+        if (method_exists($db, 'get_schema')) {
+            $schema = DB::get_schema();
+            $require_index = 'require_index';
+        } else {
+            $schema = $connection;
+            $require_index = 'requireIndex';
+        }
+
         // construct query to create table with custom primary key
         $sql = join(' ', [
             "CREATE TABLE IF NOT EXISTS SearchableDataObjects (",
-                "ID int(10) {$unsigned} NOT NULL,",
-                "ClassName " . $connection->varchar(['precision' => 255]) . ",",
-                "Title " . $connection->varchar(['precision' => 255]) . " NOT NULL,",
-                "Content " . $connection->text([]) . " NOT NULL,",
-                "PageID " . $connection->int(['precision' => 11, 'null' => 'NOT NULL', 'default' => 0]) . ",",
-                "PRIMARY KEY(ID, ClassName)",
-            ")",
+                '"ID" int(10) ' . $unsigned . ' NOT NULL,',
+                '"ClassName" ' . $schema->varchar(['precision' => 255]) . ',',
+                '"Title" ' . $schema->varchar(['precision' => 255]) . ' NOT NULL,',
+                '"Content" ' . $schema->text([]) . ' NOT NULL,',
+                '"PageID" ' . $schema->int(['precision' => 11, 'null' => 'NOT NULL', 'default' => 0]) . ',',
+                'PRIMARY KEY("ID", "ClassName")',
+            ')',
             $extraOptions,
         ]);
 
         // add table
         DB::query($sql);
 
-        // use current index requirement function
-        if (method_exists($connection, 'require_index')) {
-            $require_index = 'require_index';
-        } elseif (method_exists($connection, 'requireIndex')) {
-            $require_index = 'requireIndex';
-        }
-
         // add search index requirement
-        if (isset($require_index)) {
-            DB::$require_index(
-                'SearchableDataObjects',
-                'Title',
-                array('value' => '"Title", "Content"', 'type' => 'fulltext')
-            );
-        }
+        DB::$require_index(
+            'SearchableDataObjects',
+            'Title',
+            array('value' => '"Title", "Content"', 'type' => 'fulltext')
+        );
     }
 
     /**
