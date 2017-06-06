@@ -22,9 +22,24 @@ class PopulateSearch extends BuildTask
         // remove existing table and recreate
         DB::query("DROP TABLE IF EXISTS SearchableDataObjects");
 
-        // create searchable table and index
-        $searchable = singleton('SearchableDataObject');
-        $searchable->augmentDatabase();
+        // use requirements to recreate table and indices
+
+        // get searchable classes
+        $implementors = ClassInfo::implementorsOf('Searchable');
+
+        // perform requirements for searchable classes
+        $conn = DB::getConn();
+        $conn->beginSchemaUpdate();
+        foreach ($implementors as $implementor) {
+            if (class_exists($implementor)) {
+                $searchable = singleton($implementor);
+                $searchable->requireTable();
+                // only needs to be done once
+                break;
+            }
+        }
+        $conn->endSchemaUpdate();
+        ClassInfo::reset_db_cache();
     }
 
     /**
