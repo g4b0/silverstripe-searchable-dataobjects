@@ -28,17 +28,16 @@ class PopulateSearch extends BuildTask
         $implementors = ClassInfo::implementorsOf('Searchable');
 
         // perform requirements for searchable classes
-        $conn = DB::getConn();
-        $conn->beginSchemaUpdate();
-        foreach ($implementors as $implementor) {
-            if (class_exists($implementor)) {
-                $searchable = singleton($implementor);
-                $searchable->requireTable();
-                // only needs to be done once
-                break;
+        DB::get_schema()->schemaUpdate(function () use ($implementors) {
+            foreach ($implementors as $implementor) {
+                if (class_exists($implementor)) {
+                    $searchable = singleton($implementor);
+                    $searchable->requireTable();
+                    // only needs to be done once
+                    // break;
+                }
             }
-        }
-        $conn->endSchemaUpdate();
+        });
         ClassInfo::reset_db_cache();
     }
 
