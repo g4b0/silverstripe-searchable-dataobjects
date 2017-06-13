@@ -1,0 +1,24 @@
+Page:
+  homepage:
+    Title: Home
+    Content: 'Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.'
+  testpage:
+    Title: Test Page
+    Content: '<p>Searchable Data Objects test page.</p>'
+SearchPage:
+  searchpage:
+    Title: Search
+    Content: 'Search for stuff.'
+TestDataObject:
+  test1:
+    Title: Test 1
+    Subtitle: Testing all the things
+    Content: '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nisl eros, pharetra non fermentum id, pellentesque egestas ligula.</p>'
+  test2:
+    Title: Test 2
+    Subtitle: Quis nostrum exercitationem
+    Content: '<p>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>'
+  test3:
+    Title: Test 3
+    Subtitle: At vero eos et accusamus
+    Content: '<p>Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.</p>'

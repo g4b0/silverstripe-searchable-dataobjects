@@ -36,8 +36,16 @@ class SearchableDataObject extends DataExtension
             } else {
                 $this->deleteDo($this->owner);
             }
-        } elseif ($this->owner instanceof Page) {
-            PopulateSearch::insertPage($this->owner);
+        } elseif ($this->owner instanceof Page) { // Page is versioned but usually doesn't implement Searchable
+            $page = Versioned::get_by_stage('Page', 'Live')->filter(array(
+                'ID' => $this->owner->ID,
+                'ShowInSearch' => 1,
+            ))->first();
+            if ($page) {
+                PopulateSearch::insertPage($page);
+            } else {
+                $this->deleteDo($this->owner);
+            }
         }
     }
 
@@ -57,19 +65,10 @@ class SearchableDataObject extends DataExtension
     public function augmentDatabase()
     {
         $connection = DB::getConn();
+        $schema = DB::get_schema();
         $isMySQL = ($connection->getDatabaseServer() === 'mysql');
         $unsigned = ($isMySQL) ? 'unsigned' : '';
         $extraOptions = ($isMySQL) ? ' ENGINE=MyISAM' : '';
-
-        // get appropriate methods for SilverStripe version
-        $db = singleton('DB');
-        if (method_exists($db, 'get_schema')) {
-            $schema = DB::get_schema();
-            $require_index = 'require_index';
-        } else {
-            $schema = $connection;
-            $require_index = 'requireIndex';
-        }
 
         // construct query to create table with custom primary key
         $sql = join(' ', [
@@ -88,7 +87,7 @@ class SearchableDataObject extends DataExtension
         DB::query($sql);
 
         // add search index requirement
-        DB::$require_index(
+        DB::require_index(
             'SearchableDataObjects',
             'Title',
             array('value' => '"Title", "Content"', 'type' => 'fulltext')
