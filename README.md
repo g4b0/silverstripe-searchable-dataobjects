@@ -10,7 +10,7 @@ they are not included in frontend search. This module let you insert DataObject 
 
 ## Requirements
 
- * SilverStripe 3.1.*
+ * SilverStripe 3.2.*
  * zirak/htmlpurifier
 
 ### Installation
