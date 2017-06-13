@@ -104,21 +104,21 @@ class CustomSearch extends Extension
     /**
      * Process and render search results.
      *
+     * @param SS_HTTPRequest $request Request generated for this action
      * @param array $data The raw request data submitted by user
      * @param SearchForm $form The form instance that was submitted
-     * @param SS_HTTPRequest $request Request generated for this action
      */
-    public function getSearchResults($request)
+    public function getSearchResults($request, $data = [], $form = null)
     {
         $list = new ArrayList();
 
-        $v = $request->getVars();
-        $q = $v["Search"];
+        // get search query
+        $q = (isset($data['Search'])) ? $data['Search'] : $request->getVar('Search');
 
         $input = DB::getConn()->addslashes($q);
-        $data = DB::query("SELECT * FROM \"SearchableDataObjects\" WHERE MATCH (\"Title\", \"Content\") AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
+        $results = DB::query("SELECT * FROM \"SearchableDataObjects\" WHERE MATCH (\"Title\", \"Content\") AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
 
-        foreach ($data as $row) {
+        foreach ($results as $row) {
             $do = DataObject::get_by_id($row['ClassName'], $row['ID']);
 
             /*
@@ -148,10 +148,11 @@ class CustomSearch extends Extension
     public function results($data, $form, $request)
     {
         $data = array(
-                'Results' => $this->getSearchResults($request),
+                'Results' => $this->getSearchResults($request, $data),
                 'Query' => $form->getSearchQuery(),
                 'Title' => _t('CustomSearch.SEARCHRESULTS', 'Risultati della ricerca')
         );
+
         return $this->owner->customise($data)->renderWith(array('Page_results', 'Page'));
     }
 }
