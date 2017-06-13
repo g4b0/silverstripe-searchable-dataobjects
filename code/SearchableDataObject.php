@@ -36,8 +36,16 @@ class SearchableDataObject extends DataExtension
             } else {
                 $this->deleteDo($this->owner);
             }
-        } elseif ($this->owner instanceof Page) {
-            PopulateSearch::insertPage($this->owner);
+        } elseif ($this->owner instanceof Page) { // Page is versioned but usually doesn't implement Searchable
+            $page = Versioned::get_by_stage('Page', 'Live')->filter(array(
+                'ID' => $this->owner->ID,
+                'ShowInSearch' => 1,
+            ))->first();
+            if ($page) {
+                PopulateSearch::insertPage($page);
+            } else {
+                $this->deleteDo($this->owner);
+            }
         }
     }
 
