@@ -110,6 +110,12 @@ class CustomSearch extends Extension
      */
     public function getSearchResults($request, $data = [], $form = null)
     {
+        // check that Fulltext is enabled
+        if (!self::isFulltextSupported()) {
+            // empty result if not
+            return PaginatedList::create(ArrayList::create());
+        }
+
         $list = new ArrayList();
 
         // get search query
@@ -154,5 +160,29 @@ class CustomSearch extends Extension
         );
 
         return $this->owner->customise($data)->renderWith(array('Page_results', 'Page'));
+    }
+
+    /**
+     * Check if Fulltext search is supported
+     * @return boolean True if supported
+     */
+    public static function isFulltextSupported()
+    {
+        $conn = DB::get_conn();
+
+        if ($conn instanceof MySQLDatabase) {
+            return true;
+        }
+
+        // check SQLite and enabled
+        if ($conn instanceof SQLite3Database) {
+            $checkOption = "sqlite_compileoption_used('IsFullTextInstalled')";
+            $result = DB::query("SELECT $checkOption")->first();
+            if (isset($result[$checkOption]) && $result[$checkOption]) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

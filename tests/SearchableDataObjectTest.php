@@ -49,6 +49,15 @@ class SearchableDataObjectTest extends SapphireTest
         $schema = DB::get_schema();
 
         $this->assertTrue($schema->hasTable('SearchableDataObjects'));
+    }
+
+    public function testHasSearchableDataObjectsIndex()
+    {
+        if (!(DB::get_conn() instanceof MySQLDatabase)) {
+            $this->markTestSkipped('MySQL only');
+        }
+
+        $schema = DB::get_schema();
 
         // ensure custom index exists
         $indexList = $schema->indexList('SearchableDataObjects');
@@ -70,18 +79,30 @@ class SearchableDataObjectTest extends SapphireTest
 
     public function testSearchForDataObject()
     {
+        if (!CustomSearch::isFulltextSupported()) {
+            $this->markTestSkipped('Fulltext not supported');
+        }
+
         $object = $this->objFromFixture('TestDataObject', 'test1');
         $this->assertEquals(1, $this->getSearchResultsCount($object->Subtitle));
     }
 
     public function testDraftPageNotSearchable()
     {
+        if (!CustomSearch::isFulltextSupported()) {
+            $this->markTestSkipped('Fulltext not supported');
+        }
+
         $page = $this->objFromFixture('Page', 'homepage');
         $this->assertEquals(0, $this->getSearchResultsCount($page->Title));
     }
 
     public function testPublishedPageSearchable()
     {
+        if (!CustomSearch::isFulltextSupported()) {
+            $this->markTestSkipped('Fulltext not supported');
+        }
+
         $page = $this->objFromFixture('Page', 'homepage');
 
         // publish the page
@@ -91,6 +112,10 @@ class SearchableDataObjectTest extends SapphireTest
 
     public function testDraftPageChangeNotSearchable()
     {
+        if (!CustomSearch::isFulltextSupported()) {
+            $this->markTestSkipped('Fulltext not supported');
+        }
+
         $page = $this->objFromFixture('Page', 'homepage');
 
         // publish the page
@@ -108,6 +133,10 @@ class SearchableDataObjectTest extends SapphireTest
 
     public function testDeleteDataObject()
     {
+        if (!CustomSearch::isFulltextSupported()) {
+            $this->markTestSkipped('Fulltext not supported');
+        }
+
         $object = $this->objFromFixture('TestDataObject', 'test1');
         $subtitle = $object->Subtitle;
 
