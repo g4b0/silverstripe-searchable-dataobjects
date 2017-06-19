@@ -116,13 +116,23 @@ class CustomSearch extends Extension
             return PaginatedList::create(ArrayList::create());
         }
 
+        $conn = DB::getConn();
         $list = new ArrayList();
 
         // get search query
         $q = (isset($data['Search'])) ? $data['Search'] : $request->getVar('Search');
 
-        $input = DB::getConn()->addslashes($q);
-        $results = DB::query("SELECT * FROM \"SearchableDataObjects\" WHERE MATCH (\"Title\", \"Content\") AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
+        $input = $conn->addslashes($q);
+
+        if ($conn instanceof SQLite3Database) {
+            // query using SQLite FTS
+            $query = "SELECT * FROM \"SearchableDataObjects\" WHERE \"SearchableDataObjects\" MATCH '$input'";
+        } else {
+            // query using MySQL Fulltext
+            $query = "SELECT * FROM \"SearchableDataObjects\" WHERE MATCH (\"Title\", \"Content\") AGAINST ('$input' IN NATURAL LANGUAGE MODE)";
+        }
+
+        $results = DB::query($query);
 
         foreach ($results as $row) {
             $do = DataObject::get_by_id($row['ClassName'], $row['ID']);
