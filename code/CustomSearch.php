@@ -110,13 +110,29 @@ class CustomSearch extends Extension
      */
     public function getSearchResults($request, $data = [], $form = null)
     {
+        // check that Fulltext is enabled
+        if (!self::isFulltextSupported()) {
+            // empty result if not
+            return PaginatedList::create(ArrayList::create());
+        }
+
+        $conn = DB::getConn();
         $list = new ArrayList();
 
         // get search query
         $q = (isset($data['Search'])) ? $data['Search'] : $request->getVar('Search');
 
-        $input = DB::getConn()->addslashes($q);
-        $results = DB::query("SELECT * FROM \"SearchableDataObjects\" WHERE MATCH (\"Title\", \"Content\") AGAINST ('$input' IN NATURAL LANGUAGE MODE)");
+        $input = $conn->addslashes($q);
+
+        if ($conn instanceof SQLite3Database) {
+            // query using SQLite FTS
+            $query = "SELECT * FROM \"SearchableDataObjects\" WHERE \"SearchableDataObjects\" MATCH '$input'";
+        } else {
+            // query using MySQL Fulltext
+            $query = "SELECT * FROM \"SearchableDataObjects\" WHERE MATCH (\"Title\", \"Content\") AGAINST ('$input' IN NATURAL LANGUAGE MODE)";
+        }
+
+        $results = DB::query($query);
 
         foreach ($results as $row) {
             $do = DataObject::get_by_id($row['ClassName'], $row['ID']);
@@ -154,5 +170,29 @@ class CustomSearch extends Extension
         );
 
         return $this->owner->customise($data)->renderWith(array('Page_results', 'Page'));
+    }
+
+    /**
+     * Check if Fulltext search is supported
+     * @return boolean True if supported
+     */
+    public static function isFulltextSupported()
+    {
+        $conn = DB::get_conn();
+
+        if ($conn instanceof MySQLDatabase) {
+            return true;
+        }
+
+        // check SQLite and enabled
+        if ($conn instanceof SQLite3Database) {
+            $checkOption = "sqlite_compileoption_used('IsFullTextInstalled')";
+            $result = DB::query("SELECT $checkOption")->first();
+            if (isset($result[$checkOption]) && $result[$checkOption]) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

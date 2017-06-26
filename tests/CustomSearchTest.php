@@ -16,7 +16,8 @@ class CustomSearchTest extends FunctionalTest
         'TestDataObject' => array('SearchableDataObject'),
     );
 
-    public function setUp() {
+    public function setUp()
+    {
         parent::setUp();
 
         // suppress themes
@@ -50,6 +51,10 @@ class CustomSearchTest extends FunctionalTest
 
     public function testSearchFormResults()
     {
+        if (!CustomSearch::isFulltextSupported()) {
+            $this->markTestSkipped('Fulltext not supported');
+        }
+
         // publish page for test
         $homepage = $this->objFromFixture('Page', 'homepage');
         $homepage->publish("Stage", "Live");

@@ -29,6 +29,10 @@ class PopulateSearchTest extends SapphireTest
 
     public function testRecreateSearchableDataObjectsTable()
     {
+        if (!(DB::get_conn() instanceof MySQLDatabase)) {
+            $this->markTestSkipped('MySQL only');
+        }
+
         $schema = DB::get_schema();
         $page = $this->objFromFixture('Page', 'homepage');
         $object = $this->objFromFixture('TestDataObject', 'test1');
