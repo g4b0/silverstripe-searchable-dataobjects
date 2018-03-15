@@ -21,8 +21,7 @@ class CustomSearch extends Extension
     private static $search_controller = 'SearchPage';
 
     private static $allowed_actions = array(
-            'SearchForm',
-            'results',
+        'SearchForm',
     );
 
     /**
