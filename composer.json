@@ -3,7 +3,7 @@
     "description": "This module adds DataObjects to frontend search",
     "type": "silverstripe-module",
     "keywords": ["silverstripe", "dataobject", "search"],
-    "license": "GPL-2",
+    "license": "GPL-2.0-only",
     "authors": [{
         "name": "Gabriele Brosulo - Zirak",
         "email": "gabriele.brosulo@zirak.it"
