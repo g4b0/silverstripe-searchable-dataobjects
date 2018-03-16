@@ -13,6 +13,8 @@ they are not included in frontend search. This module let you insert DataObject 
  * SilverStripe 3.2.*
  * zirak/htmlpurifier
 
+For SilverStripe 3.1 usage please referr to version 3.0 and below.
+
 ### Installation
 
 Install the module through [composer](http://getcomposer.org):
