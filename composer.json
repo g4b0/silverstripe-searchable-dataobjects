@@ -9,8 +9,8 @@
         "email": "gabriele.brosulo@zirak.it"
     }],
     "require": {
-        "silverstripe/framework": "~3.2.0",
-        "silverstripe/cms": "~3.2.0",
+        "silverstripe/framework": "~3.2",
+        "silverstripe/cms": "~3.2",
         "zirak/htmlpurifier": "1.0.*"
     }
 }
