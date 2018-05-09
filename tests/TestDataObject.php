@@ -1,4 +1,11 @@
 <?php
+
+namespace g4b0\SearchableDataObjects\Tests;
+
+use g4b0\SearchableDataObjects\Searchable;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\DataObject;
+
 /**
  * Test DataObject
  */

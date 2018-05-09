@@ -1,5 +1,10 @@
 <?php
 
+namespace g4b0\SearchableDataObjects;
+
+use \Page;
+use \PageController;
+
 class SearchPage extends Page
 {
 
@@ -21,6 +26,6 @@ class SearchPage extends Page
     }
 }
 
-class SearchPage_Controller extends Page_Controller
+class SearchPageController extends PageController
 {
 }

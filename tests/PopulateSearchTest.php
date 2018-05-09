@@ -1,4 +1,11 @@
 <?php
+
+namespace g4b0\SearchableDataObjects\Tests;
+
+use g4b0\SearchableDataObjects\Tasks\PopulateSearch;
+use SilverStripe\Control\HTTPRequest as SS_HTTPRequest;
+use SilverStripe\Dev\SapphireTest;
+
 /**
  * Test PopulateSearch
  */

@@ -1,5 +1,16 @@
 <?php
 
+namespace g4b0\SearchableDataObjects\Tasks;
+
+use \Page;
+use g4b0\HTMLPurifier\Purifier;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Convert;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
+use SilverStripe\Versioned\Versioned;
+
 /**
  * Ricrea la tabella di ricerca ad ogni esecuzione, e la popola con i dati
  * prelevati dai DataObject
@@ -25,7 +36,7 @@ class PopulateSearch extends BuildTask
         // use requirements to recreate table and indices
 
         // get searchable classes
-        $implementors = ClassInfo::implementorsOf('Searchable');
+        $implementors = ClassInfo::implementorsOf('g4b0\SearchableDataObjects\Searchable');
 
         // perform requirements for searchable classes
         DB::get_schema()->schemaUpdate(function () use ($implementors) {
@@ -120,7 +131,7 @@ class PopulateSearch extends BuildTask
         /*
          * DataObjects
          */
-        $searchables = ClassInfo::implementorsOf('Searchable');
+        $searchables = ClassInfo::implementorsOf('g4b0\SearchableDataObjects\Searchable');
         foreach ($searchables as $class) {
             // Filter
             $dos = $class::get()

@@ -1,5 +1,24 @@
 <?php
 
+namespace g4b0\SearchableDataObjects;
+
+use SilverStripe\CMS\Controllers\ModelAsController;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\CMS\Search\SearchForm;
+use SilverStripe\Control\Controller;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Convert;
+use SilverStripe\Core\Extension;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\Connect\MySQLDatabase;
+use SilverStripe\SQLite\SQLite3Database;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\PaginatedList;
+
 /**
  * Extension to provide a search interface when applied to ContentController
  *
@@ -153,7 +172,7 @@ class CustomSearch extends Extension
             }
         }
 
-        $pageLength = Config::inst()->get('CustomSearch', 'items_per_page');
+        $pageLength = Config::inst()->get('g4b0\SearchableDataObjects\CustomSearch', 'items_per_page');
         $ret = new PaginatedList($list, $request);
         $ret->setPageLength($pageLength);
 

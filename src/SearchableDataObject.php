@@ -1,5 +1,14 @@
 <?php
 
+namespace g4b0\SearchableDataObjects;
+
+use \Page;
+use g4b0\SearchableDataObjects\Tasks\PopulateSearch;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
+use SilverStripe\Versioned\Versioned;
+
 /**
  * SearchableDataObject - extension that let the DO to auto update the search table
  * after a write
@@ -21,7 +30,7 @@ class SearchableDataObject extends DataExtension
     {
         parent::onAfterWrite();
 
-        if (in_array('Searchable', class_implements($this->owner->class))) {
+        if (in_array('g4b0\SearchableDataObjects\Searchable', class_implements($this->owner->getClassName()))) {
             if ($this->owner->hasExtension('Versioned')) {
                 $filterID = array('ID' => $this->owner->ID);
                 $filter = $filterID + $this->owner->getSearchFilter();

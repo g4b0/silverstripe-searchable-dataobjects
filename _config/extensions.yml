@@ -1,6 +1,6 @@
 ---
 Name: searchable-dataobjects-extensions
 ---
-ContentController:
+SilverStripe\CMS\Controllers\ContentController:
   extensions:
-    - CustomSearch
+    - g4b0\SearchableDataObjects\CustomSearch

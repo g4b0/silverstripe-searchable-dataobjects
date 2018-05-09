@@ -1,4 +1,14 @@
 <?php
+
+namespace g4b0\SearchableDataObjects\Tests;
+
+use \PageController;
+use g4b0\SearchableDataObjects\CustomSearch;
+use SilverStripe\Control\HTTPRequest as SS_HTTPRequest;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\Connect\MySQLDatabase;
+use SilverStripe\ORM\DB;
+
 /**
  * Test SearchableDataObject
  */
@@ -24,7 +34,7 @@ class SearchableDataObjectTest extends SapphireTest
     {
         $page = $this->objFromFixture('Page', 'homepage');
         $request = new SS_HTTPRequest('GET', $page->URLSegment, ['Search' => $query]);
-        return Page_Controller::create($page)->getSearchResults($request);
+        return PageController::create($page)->getSearchResults($request);
     }
 
     /**
