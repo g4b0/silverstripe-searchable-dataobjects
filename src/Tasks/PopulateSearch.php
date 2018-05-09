@@ -32,10 +32,8 @@ class PopulateSearch extends BuildTask
      */
     private function clearTable()
     {
-        // remove existing table and recreate
-        DB::query("DROP TABLE IF EXISTS SearchableDataObjects");
-
-        // use requirements to recreate table and indices
+        // truncate the table
+        DB::query("TRUNCATE TABLE SearchableDataObjects");
 
         // get searchable classes
         $implementors = ClassInfo::implementorsOf('g4b0\SearchableDataObjects\Searchable');
