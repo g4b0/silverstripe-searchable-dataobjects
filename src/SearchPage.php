@@ -18,6 +18,8 @@ class SearchPage extends Page
         'ShowInMenu' => false
     );
 
+    private static $table_name = 'SearchPage';
+
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();

@@ -15,7 +15,7 @@ use SilverStripe\ORM\DB;
 class SearchableDataObjectTest extends SapphireTest
 {
     protected $extraDataObjects = array(
-        'TestDataObject',
+        TestDataObject::class
     );
 
     protected static $fixture_file = 'SearchableDataObjectTest.yml';

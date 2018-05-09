@@ -17,6 +17,8 @@ class TestDataObject extends DataObject implements TestOnly, Searchable
         'Content'  => 'HTMLText',
     );
 
+    private static $table_name = 'TestDataObject';
+
     /**
      * Link to this DO
      * @return string

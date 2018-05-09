@@ -13,7 +13,7 @@ class PopulateSearchTest extends SapphireTest
 {
 
     protected $extraDataObjects = array(
-        'TestDataObject',
+        TestDataObject::class
     );
 
     protected static $fixture_file = 'SearchableDataObjectTest.yml';

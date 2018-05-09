@@ -25,6 +25,8 @@ class PopulateSearch extends BuildTask
     /** @var string Task description */
     protected $description = 'Re-create the search table at each run, and populate it with the data from the DataObject.';
 
+    private static $segment = "PopulateSearch";
+
     /**
      * DB initalization
      */
@@ -102,9 +104,9 @@ class PopulateSearch extends BuildTask
              VALUES
                 (%1$d, \'%2$s\', \'%3$s\', \'%4$s\')',
             intval($id),
-            DB::getConn()->addslashes($class_name),
-            DB::getConn()->addslashes($title),
-            DB::getConn()->addslashes($content)
+            Convert::raw2sql($class_name),
+            Convert::raw2sql($title),
+            Convert::raw2sql($content)
         );
 
         // run query ...

@@ -134,13 +134,13 @@ class CustomSearch extends Extension
             return PaginatedList::create(ArrayList::create());
         }
 
-        $conn = DB::getConn();
+        $conn = DB::get_conn();
         $list = new ArrayList();
 
         // get search query
         $q = (isset($data['Search'])) ? $data['Search'] : $request->getVar('Search');
 
-        $input = $conn->addslashes($q);
+        $input = Convert::raw2sql($q);
 
         if ($conn instanceof SQLite3Database) {
             // query using SQLite FTS

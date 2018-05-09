@@ -22,7 +22,7 @@ class SearchableDataObject extends DataExtension
     private function deleteDo(DataObject $do)
     {
         $id = $do->ID;
-        $class = $do->class;
+        $class = $do->getClassName();
         DB::query("DELETE FROM \"SearchableDataObjects\" WHERE ID=$id AND ClassName='$class'");
     }
 
@@ -34,10 +34,10 @@ class SearchableDataObject extends DataExtension
             if ($this->owner->hasExtension('Versioned')) {
                 $filterID = array('ID' => $this->owner->ID);
                 $filter = $filterID + $this->owner->getSearchFilter();
-                $do = Versioned::get_by_stage($this->owner->class, 'Live')->filter($filter)->first();
+                $do = Versioned::get_by_stage($this->owner->getClassName(), 'Live')->filter($filter)->first();
             } else {
                 $filterID = "`{$this->findParentClass()}`.`ID`={$this->owner->ID}";
-                $do = DataObject::get($this->owner->class, $filterID, false)->filter($this->owner->getSearchFilter())->first();
+                $do = DataObject::get($this->owner->getClassName(), $filterID, false)->filter($this->owner->getSearchFilter())->first();
             }
 
             if ($do) {
@@ -73,7 +73,7 @@ class SearchableDataObject extends DataExtension
    */
     public function augmentDatabase()
     {
-        $connection = DB::getConn();
+        $connection = DB::get_conn();
         $schema = DB::get_schema();
         $isMySQL = ($connection->getDatabaseServer() === 'mysql');
         $unsigned = ($isMySQL) ? 'unsigned' : '';
@@ -99,7 +99,10 @@ class SearchableDataObject extends DataExtension
         DB::require_index(
             'SearchableDataObjects',
             'Title',
-            array('value' => '"Title", "Content"', 'type' => 'fulltext')
+            [
+                'columns' => [ 'Title', 'Content'],
+                'type' => 'fulltext'
+            ]
         );
     }
 
@@ -109,11 +112,11 @@ class SearchableDataObject extends DataExtension
     private function findParentClass($class = null)
     {
         if (is_null($class)) {
-            $class = $this->owner->class;
+            $class = $this->owner->getClassName();
         }
+ 
+        $parent = get_parent_class($class);
 
-        $parent = singleton($class)->parentClass();
-
-        return $parent === 'DataObject' ? $class : $this->findParentClass($parent);
+        return $parent === 'SilverStripe\ORM\DataObject' ? $class : $this->findParentClass($parent);
     }
 }
