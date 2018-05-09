@@ -151,6 +151,10 @@ class PopulateSearch extends BuildTask
                 }
 
                 foreach ($dos as $do) {
+
+                    // Force the class to DataObject so we can pass descendants of DataObject
+                    $do->setClassName('DataObject');
+
                     self::insert($do);
                 }
             }
