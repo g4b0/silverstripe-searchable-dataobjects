@@ -36,7 +36,7 @@ class SearchableDataObject extends DataExtension
                 $filter = $filterID + $this->owner->getSearchFilter();
                 $do = Versioned::get_by_stage($this->owner->getClassName(), 'Live')->filter($filter)->first();
             } else {
-                $filterID = "`{$this->findParentClass()}`.`ID`={$this->owner->ID}";
+                $filterID = "`{$this->findParentTable()}`.`ID`={$this->owner->ID}";
                 $do = DataObject::get($this->owner->getClassName(), $filterID, false)->filter($this->owner->getSearchFilter())->first();
             }
 
@@ -107,9 +107,9 @@ class SearchableDataObject extends DataExtension
     }
 
     /**
-     * Recursive function to find the parent class of the current data object
+     * Recursive function to find the parent table of the current data object
      */
-    private function findParentClass($class = null)
+    private function findParentTable($class = null)
     {
         if (is_null($class)) {
             $class = $this->owner->getClassName();
@@ -117,6 +117,9 @@ class SearchableDataObject extends DataExtension
  
         $parent = get_parent_class($class);
 
-        return $parent === 'SilverStripe\ORM\DataObject' ? $class : $this->findParentClass($parent);
+        // Get the table name of the class
+        $tableName = singleton($class)->baseTable();
+
+        return $parent === 'SilverStripe\ORM\DataObject' ? $tableName : $this->findParentTable($parent);
     }
 }
