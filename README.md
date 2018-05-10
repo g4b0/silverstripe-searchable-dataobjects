@@ -10,16 +10,17 @@ they are not included in frontend search. This module let you insert DataObject 
 
 ## Requirements
 
- * SilverStripe 3.2.*
- * zirak/htmlpurifier
+ * SilverStripe 4.1
+ * g4b0/htmlpurifier
 
 For SilverStripe 3.1 usage please referr to version 3.0 and below.
+For SilverStripe >3.1 & <4.0 usage please referr to version 4.x.
 
 ### Installation
 
 Install the module through [composer](http://getcomposer.org):
 
-    composer require zirak/searchable-dataobjects
+    composer require g4b0/searchable-dataobjects
     composer update
 
 Make the DataObject (or Pages) implement Searchable interface (you need to implement Link(), getSearchFilter(), getTitleFields(),
@@ -204,4 +205,4 @@ Full-text searches are natural language searches if the IN NATURAL LANGUAGE MODE
 
 ### Suggested modules
 
- * Linkable DataObjects: http://addons.silverstripe.org/add-ons/zirak/linkable-dataobjects
+ * Linkable DataObjects: http://addons.silverstripe.org/add-ons/g4b0/linkable-dataobjects
