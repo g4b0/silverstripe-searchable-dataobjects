@@ -1,4 +1,13 @@
 <?php
+
+namespace g4b0\SearchableDataObjects\Tests;
+
+use g4b0\SearchableDataObjects\CustomSearch;
+use SilverStripe\CMS\Controllers\ContentController;
+use SilverStripe\Control\HTTPRequest as SS_HTTPRequest;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Dev\FunctionalTest;
+
 /**
  * Test CustomSearch
  */

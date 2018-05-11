@@ -1,5 +1,14 @@
 <?php
 
+namespace g4b0\SearchableDataObjects;
+
+use \Page;
+use g4b0\SearchableDataObjects\Tasks\PopulateSearch;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
+use SilverStripe\Versioned\Versioned;
+
 /**
  * SearchableDataObject - extension that let the DO to auto update the search table
  * after a write
@@ -13,7 +22,7 @@ class SearchableDataObject extends DataExtension
     private function deleteDo(DataObject $do)
     {
         $id = $do->ID;
-        $class = $do->class;
+        $class = $do->getClassName();
         DB::query("DELETE FROM \"SearchableDataObjects\" WHERE ID=$id AND ClassName='$class'");
     }
 
@@ -21,14 +30,14 @@ class SearchableDataObject extends DataExtension
     {
         parent::onAfterWrite();
 
-        if (in_array('Searchable', class_implements($this->owner->class))) {
+        if (in_array('g4b0\SearchableDataObjects\Searchable', class_implements($this->owner->getClassName()))) {
             if ($this->owner->hasExtension('Versioned')) {
                 $filterID = array('ID' => $this->owner->ID);
                 $filter = $filterID + $this->owner->getSearchFilter();
-                $do = Versioned::get_by_stage($this->owner->class, 'Live')->filter($filter)->first();
+                $do = Versioned::get_by_stage($this->owner->getClassName(), 'Live')->filter($filter)->first();
             } else {
-                $filterID = "`{$this->findParentClass()}`.`ID`={$this->owner->ID}";
-                $do = DataObject::get($this->owner->class, $filterID, false)->filter($this->owner->getSearchFilter())->first();
+                $filterID = "`{$this->findParentTable()}`.`ID`={$this->owner->ID}";
+                $do = DataObject::get($this->owner->getClassName(), $filterID, false)->filter($this->owner->getSearchFilter())->first();
             }
 
             if ($do) {
@@ -64,7 +73,7 @@ class SearchableDataObject extends DataExtension
    */
     public function augmentDatabase()
     {
-        $connection = DB::getConn();
+        $connection = DB::get_conn();
         $schema = DB::get_schema();
         $isMySQL = ($connection->getDatabaseServer() === 'mysql');
         $unsigned = ($isMySQL) ? 'unsigned' : '';
@@ -90,21 +99,27 @@ class SearchableDataObject extends DataExtension
         DB::require_index(
             'SearchableDataObjects',
             'Title',
-            array('value' => '"Title", "Content"', 'type' => 'fulltext')
+            [
+                'columns' => [ 'Title', 'Content'],
+                'type' => 'fulltext'
+            ]
         );
     }
 
     /**
-     * Recursive function to find the parent class of the current data object
+     * Recursive function to find the parent table of the current data object
      */
-    private function findParentClass($class = null)
+    private function findParentTable($class = null)
     {
         if (is_null($class)) {
-            $class = $this->owner->class;
+            $class = $this->owner->getClassName();
         }
+ 
+        $parent = get_parent_class($class);
 
-        $parent = singleton($class)->parentClass();
+        // Get the table name of the class
+        $tableName = singleton($class)->baseTable();
 
-        return $parent === 'DataObject' ? $class : $this->findParentClass($parent);
+        return $parent === 'SilverStripe\ORM\DataObject' ? $tableName : $this->findParentTable($parent);
     }
 }

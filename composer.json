@@ -8,9 +8,15 @@
         "name": "Gabriele Brosulo - Zirak",
         "email": "gabriele.brosulo@zirak.it"
     }],
+    "autoload": {
+        "psr-4": {
+            "g4b0\\SearchableDataObjects\\": "src/",
+            "g4b0\\SearchableDataObjects\\Tests\\": "tests/"
+        }
+    },
     "require": {
-        "silverstripe/framework": "~3.2",
-        "silverstripe/cms": "~3.2",
+        "silverstripe/framework": "^4.0",
+        "silverstripe/cms": "^4.0",
         "zirak/htmlpurifier": "1.0.*"
     }
 }

@@ -1,4 +1,11 @@
 <?php
+
+namespace g4b0\SearchableDataObjects\Tests;
+
+use g4b0\SearchableDataObjects\Searchable;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\DataObject;
+
 /**
  * Test DataObject
  */
@@ -9,6 +16,8 @@ class TestDataObject extends DataObject implements TestOnly, Searchable
         'Subtitle' => 'Varchar',
         'Content'  => 'HTMLText',
     );
+
+    private static $table_name = 'TestDataObject';
 
     /**
      * Link to this DO

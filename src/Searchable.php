@@ -1,5 +1,7 @@
 <?php
 
+namespace g4b0\SearchableDataObjects;
+
 /**
  * Searchable - interface to implement in order to be a searchable DO
  *

@@ -1,5 +1,16 @@
 <?php
 
+namespace g4b0\SearchableDataObjects\Tasks;
+
+use \Page;
+use g4b0\HTMLPurifier\Purifier;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Convert;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
+use SilverStripe\Versioned\Versioned;
+
 /**
  * Ricrea la tabella di ricerca ad ogni esecuzione, e la popola con i dati
  * prelevati dai DataObject
@@ -14,18 +25,18 @@ class PopulateSearch extends BuildTask
     /** @var string Task description */
     protected $description = 'Re-create the search table at each run, and populate it with the data from the DataObject.';
 
+    private static $segment = "PopulateSearch";
+
     /**
      * DB initalization
      */
     private function clearTable()
     {
-        // remove existing table and recreate
-        DB::query("DROP TABLE IF EXISTS SearchableDataObjects");
-
-        // use requirements to recreate table and indices
+        // truncate the table
+        DB::query("TRUNCATE TABLE SearchableDataObjects");
 
         // get searchable classes
-        $implementors = ClassInfo::implementorsOf('Searchable');
+        $implementors = ClassInfo::implementorsOf('g4b0\SearchableDataObjects\Searchable');
 
         // perform requirements for searchable classes
         DB::get_schema()->schemaUpdate(function () use ($implementors) {
@@ -91,9 +102,9 @@ class PopulateSearch extends BuildTask
              VALUES
                 (%1$d, \'%2$s\', \'%3$s\', \'%4$s\')',
             intval($id),
-            DB::getConn()->addslashes($class_name),
-            DB::getConn()->addslashes($title),
-            DB::getConn()->addslashes($content)
+            Convert::raw2sql($class_name),
+            Convert::raw2sql($title),
+            Convert::raw2sql($content)
         );
 
         // run query ...
@@ -120,7 +131,7 @@ class PopulateSearch extends BuildTask
         /*
          * DataObjects
          */
-        $searchables = ClassInfo::implementorsOf('Searchable');
+        $searchables = ClassInfo::implementorsOf('g4b0\SearchableDataObjects\Searchable');
         foreach ($searchables as $class) {
             // Filter
             $dos = $class::get()
@@ -140,6 +151,10 @@ class PopulateSearch extends BuildTask
                 }
 
                 foreach ($dos as $do) {
+
+                    // Force the class to DataObject so we can pass descendants of DataObject
+                    $do->setClassName('DataObject');
+
                     self::insert($do);
                 }
             }
