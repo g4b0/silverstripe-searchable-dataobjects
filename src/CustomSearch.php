@@ -38,7 +38,7 @@ class CustomSearch extends Extension
      * either 'this' for the current page (owner) or a page / controller, e.g. 'SearchPage'
      * @var string
      */
-    private static $search_controller = 'SearchPage';
+    private static $search_controller = SearchPage::class;
 
     private static $allowed_actions = array(
         'SearchForm',
@@ -97,7 +97,7 @@ class CustomSearch extends Extension
      */
     public function getControllerForSearchForm()
     {
-        $controllerName = Config::inst()->get('CustomSearch', 'search_controller');
+        $controllerName = Config::inst()->get(CustomSearch::class, 'search_controller');
 
         if ($controllerName == 'this') {
             return $this->owner;
@@ -173,7 +173,7 @@ class CustomSearch extends Extension
             }
         }
 
-        $pageLength = Config::inst()->get('g4b0\SearchableDataObjects\CustomSearch', 'items_per_page');
+        $pageLength = Config::inst()->get(CustomSearch::class, 'items_per_page');
         $ret = new PaginatedList($list, $request);
         $ret->setPageLength($pageLength);
 
