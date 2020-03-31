@@ -29,6 +29,8 @@ getContentFields()):
 *Note: `getSearchFilterByCallback()` is an optional filter. If you don't plan on calculating any value to determine a returned `true` or `false` value it is suggested you don't add this function to your `DataObject` or `Page` type.*
 
 ```php
+use g4b0\SearchableDataObjects\Searchable;
+
 class DoNews extends DataObject implements Searchable {
 
     private static $db = array(
@@ -158,10 +160,10 @@ Extend Page and the desired DataObjects through the following yaml:
 ```YAML
 Page:
   extensions:
-    - SearchableDataObject
+    - g4b0\SearchableDataObjects\SearchableDataObject
 DoNews:
   extensions:
-    - SearchableDataObject
+    - g4b0\SearchableDataObjects\SearchableDataObject
 ```
 
 Run a `dev/build` and then populate the search table running PopulateSearch task:
@@ -175,17 +177,17 @@ Enjoy the news into the search results :)
 
 #### Set the number of search results per page
 
-Setting the `CustomSearch.items_per_page` config setting you can define, how many search results per page are shown. Default is 10
+Setting the `g4b0\SearchableDataObjects\CustomSearch.items_per_page` config setting you can define, how many search results per page are shown. Default is 10
 
 By default the search result is shown at the same page, so if you're searching e.g. on the */about-us/*, the results are
 shown on */about-us/SearchForm/?s=foo*. If you don't like that, you can define any Page or Controller class in the
-`CustomSearch.search_controller` setting. If you set this setting to `this`, the current page will be used. Defaults to `SearchPage`
+`g4b0\SearchableDataObjects\CustomSearch.search_controller` setting. If you set this setting to `this`, the current page will be used. Defaults to `SearchPage`
 and falls back to the current page if no SearchPage is found.
 
 ```YAML
-CustomSearch:
+g4b0\SearchableDataObjects\CustomSearch:
   items_per_page: 15
-  search_controller: SearchPage #page type to show the search
+  search_controller: g4b0\SearchableDataObjects\SearchPage #page type to show the search
 ```
 
 ### Note
