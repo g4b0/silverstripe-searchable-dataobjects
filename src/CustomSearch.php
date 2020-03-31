@@ -9,6 +9,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Extension;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\TextField;
@@ -103,7 +104,7 @@ class CustomSearch extends Extension
         }
 
         if (class_exists($controllerName)) {
-            $obj = Object::create($controllerName);
+            $obj = Injector::inst()->create($controllerName);
 
             if ($obj instanceof SiteTree && $page = $controllerName::get()->first()) {
                 return ModelAsController::controller_for($page);
