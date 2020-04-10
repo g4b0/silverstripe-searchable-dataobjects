@@ -9,6 +9,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Convert;
 use SilverStripe\Core\Extension;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\TextField;
@@ -37,7 +38,7 @@ class CustomSearch extends Extension
      * either 'this' for the current page (owner) or a page / controller, e.g. 'SearchPage'
      * @var string
      */
-    private static $search_controller = 'SearchPage';
+    private static $search_controller = SearchPage::class;
 
     private static $allowed_actions = array(
         'SearchForm',
@@ -96,14 +97,14 @@ class CustomSearch extends Extension
      */
     public function getControllerForSearchForm()
     {
-        $controllerName = Config::inst()->get('CustomSearch', 'search_controller');
+        $controllerName = Config::inst()->get(CustomSearch::class, 'search_controller');
 
         if ($controllerName == 'this') {
             return $this->owner;
         }
 
         if (class_exists($controllerName)) {
-            $obj = Object::create($controllerName);
+            $obj = Injector::inst()->create($controllerName);
 
             if ($obj instanceof SiteTree && $page = $controllerName::get()->first()) {
                 return ModelAsController::controller_for($page);
@@ -172,7 +173,7 @@ class CustomSearch extends Extension
             }
         }
 
-        $pageLength = Config::inst()->get('g4b0\SearchableDataObjects\CustomSearch', 'items_per_page');
+        $pageLength = Config::inst()->get(CustomSearch::class, 'items_per_page');
         $ret = new PaginatedList($list, $request);
         $ret->setPageLength($pageLength);
 
